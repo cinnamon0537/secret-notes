@@ -1,0 +1,37 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: secret-notes-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: encr_notes
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build: .
+    container_name: secret-notes-backend
+    depends_on:
+      - postgres
+    environment:
+      PORT: 3000
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/encr_notes
+    ports:
+      - "3000:3000"
+    command: sh -c "npm run db:migrate && npm start"
+
+  frontend:
+    build: ../secret-notes-frontend
+    container_name: secret-notes-frontend
+    depends_on:
+      - backend
+    environment:
+      VITE_API_URL: http://backend:3000
+    ports:
+      - "80:80"
+
+volumes:
+  postgres_data:

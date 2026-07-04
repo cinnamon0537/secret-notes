@@ -1,0 +1,29 @@
+{
+  "name": "secret-notes-backend",
+  "version": "1.0.0",
+  "description": "Backend for the Secret Notes semester project",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js",
+    "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --coverage --runInBand",
+    "lint": "eslint src tests",
+    "db:migrate": "node src/migrate.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@fastify/cors": "^11.2.0",
+    "dotenv": "^17.4.2",
+    "fastify": "^5.8.5",
+    "pg": "^8.22.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "eslint": "^10.5.0",
+    "jest": "^30.4.2",
+    "supertest": "^7.2.2"
+  }
+}
