@@ -46,6 +46,7 @@ Stand: 2026-07-05
 - [x] Jenkinsfile für self-hosted CI vorhanden
 - [x] Jenkins-Setup dokumentiert
 - [x] Jenkins-Demo-Run erfolgreich
+- [x] Docker Hub Dokumentation angelegt
 - [x] Lint-Stufe vorhanden
 - [x] Test-Stufe vorhanden
 - [x] Build-Stufe vorhanden
@@ -71,6 +72,10 @@ Stand: 2026-07-05
 - [ ] SonarQube-Analyse in Pipeline integriert
 - [ ] Snyk eingerichtet
 - [ ] Snyk-Scan in Pipeline integriert
+- [x] PostHog-Dokumentation angelegt
+- [x] Docker Hub Tagging-Dokumentation angelegt
+- [x] AWS Deployment-Dokumentation angelegt
+- [x] SonarQube/Snyk-Dokumentation angelegt
 
 ## 8. Feature Toggle / A/B Testing
 
@@ -122,3 +127,4 @@ Stand: 2026-07-05
 - 2026-07-05: Jenkins-Setup-Doku ergänzt.
 - 2026-07-05: Jenkinsfile um Compose-basierten E2E-/k6-Ablauf ergänzt.
 - 2026-07-05: Jenkins-Demo-Freestyle-Job erfolgreich mit grünem Build und `SUCCESS` ausgeführt.
+- 2026-07-05: Docker Hub, AWS Deployment, Quality/Security und PostHog Dokumentation ergänzt.

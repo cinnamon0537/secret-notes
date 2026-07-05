@@ -145,6 +145,9 @@ Planned tools from the spec:
 Current status:
 - Not yet integrated into the pipelines.
 
+Reference docs:
+- `QUALITY_SECURITY.md`
+
 ## 11. Logging and Monitoring
 
 Outlook only for now:
