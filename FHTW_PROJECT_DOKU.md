@@ -8,6 +8,7 @@ Current status:
 - Frontend and backend are implemented.
 - Local Docker setup is available.
 - GitHub Actions and Jenkins pipeline definitions are present.
+- Jenkins demo freestyle run is green.
 - AWS Academy CLI access is verified.
 - SonarQube, Snyk, Docker Hub push, and real AWS deployment are still missing.
 
@@ -115,7 +116,7 @@ Current state:
 
 ### Jenkins
 - Jenkinsfile exists with stages for lint, test, build, deliver, deploy, and E2E/performance.
-- No real Jenkins server run has been captured yet.
+- A demo freestyle job has been run successfully with a green build and `SUCCESS`.
 
 ### k6
 - A simple smoke test script exists for backend health and notes endpoints.

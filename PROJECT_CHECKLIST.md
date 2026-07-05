@@ -45,6 +45,7 @@ Stand: 2026-07-05
 - [x] GitHub Actions für Frontend vorhanden
 - [x] Jenkinsfile für self-hosted CI vorhanden
 - [x] Jenkins-Setup dokumentiert
+- [x] Jenkins-Demo-Run erfolgreich
 - [x] Lint-Stufe vorhanden
 - [x] Test-Stufe vorhanden
 - [x] Build-Stufe vorhanden
@@ -120,3 +121,4 @@ Stand: 2026-07-05
 - 2026-07-05: FHTW-Hauptdoku als strukturierter Entwurf angelegt.
 - 2026-07-05: Jenkins-Setup-Doku ergänzt.
 - 2026-07-05: Jenkinsfile um Compose-basierten E2E-/k6-Ablauf ergänzt.
+- 2026-07-05: Jenkins-Demo-Freestyle-Job erfolgreich mit grünem Build und `SUCCESS` ausgeführt.

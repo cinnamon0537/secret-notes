@@ -14,11 +14,11 @@ Stand: 2026-07-05
 - [ ] Frontend Lint/Test/Build lokal grün
 - [ ] Backend Lint/Test lokal grün
 - [ ] Docker Compose lokal laufend
+- [x] Jenkins green build (`SecretNotes-Demo-FS`)
+- [x] Jenkins console with `SUCCESS`
 
 ## Später
 
-- [ ] Jenkins-Job mit grünem Pipeline-Run
-- [ ] Jenkins-Konsole mit `SUCCESS`
 - [ ] Docker Hub Push mit echten Tags
 - [ ] SonarQube Quality Gate
 - [ ] Snyk Scan Ergebnis

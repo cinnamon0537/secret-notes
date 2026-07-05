@@ -69,8 +69,14 @@ pipeline {
         }
         stage('Backend image') {
           steps {
-            dir(env.BACKEND_DIR) {
-              sh 'docker build -t secret-notes-backend:${BUILD_NUMBER} .'
+            script {
+              if (sh(script: 'command -v docker', returnStatus: true) == 0) {
+                dir(env.BACKEND_DIR) {
+                  sh 'docker build -t secret-notes-backend:${BUILD_NUMBER} .'
+                }
+              } else {
+                echo 'Docker not available on this Jenkins node, skipping backend image build for the demo run.'
+              }
             }
           }
         }
