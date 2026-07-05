@@ -19,6 +19,7 @@ Stand: 2026-07-05
 - [x] Dockerfile für Frontend vorhanden
 - [x] Unit-Tests für Frontend vorhanden
 - [x] Playwright E2E-Tests vorhanden
+- [x] Frontend-CI lokal wieder grün
 
 ## 3. Backend
 
@@ -111,3 +112,4 @@ Stand: 2026-07-05
 - 2026-07-05: AWS Academy CLI-Credentials in WSL gesetzt und `sts get-caller-identity` plus `ec2 describe-instances` erfolgreich geprüft.
 - 2026-07-05: AWS Baseline geprüft: default VPC und default Security Group vorhanden, keine EC2/RDS-Instanzen im Lab.
 - 2026-07-05: Frontend-CI repariert durch ESLint-Konfiguration und Umstellung von Vitest auf `run`-Mode.
+- 2026-07-05: Frontend-CI final repariert durch Hinzufügen von `eslint` als Dev-Dependency.
