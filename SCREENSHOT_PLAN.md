@@ -4,16 +4,16 @@ Stand: 2026-07-05
 
 ## Jetzt möglich
 
-- [x] `aws sts get-caller-identity`
-- [x] `aws ec2 describe-vpcs`
-- [x] `aws ec2 describe-security-groups`
-- [x] `aws ec2 describe-instances` mit leerem Ergebnis
-- [x] `aws rds describe-db-instances` mit leerem Ergebnis
-- [x] GitHub Actions Backend erfolgreich
-- [x] GitHub Actions Frontend erfolgreich nach Fix
-- [x] Frontend Lint/Test/Build lokal grün
-- [x] Backend Lint/Test lokal grün
-- [x] Docker Compose lokal laufend
+- [x] `aws sts get-caller-identity` (`screenshots/aws_sts_get-caller-identity.png`)
+- [x] `aws ec2 describe-vpcs` (`screenshots/aws_ec2_describe-vpcs.png`)
+- [x] `aws ec2 describe-security-groups` (`screenshots/aws_ec2_describe-security-groups.png`)
+- [x] `aws ec2 describe-instances` mit leerem Ergebnis (`screenshots/aws_ec2_describe-instances_mit_leerem_Ergebnis.png`)
+- [x] `aws rds describe-db-instances` mit leerem Ergebnis (`screenshots/aws_rds_describe-db-instances_mit_leerem_Ergebnis.png`)
+- [x] GitHub Actions Backend erfolgreich (`screenshots/GitHub_Actions_erfolgreich_für_Backend.png`)
+- [x] GitHub Actions Frontend erfolgreich nach Fix (`screenshots/GitHub_Actions_erfolgreich_für_Frontend.png`)
+- [ ] Frontend Lint/Test/Build lokal grün
+- [ ] Backend Lint/Test lokal grün
+- [ ] Docker Compose lokal laufend
 
 ## Später
 
