@@ -3,6 +3,7 @@ pipeline {
 
   options {
     timestamps()
+    disableConcurrentBuilds()
   }
 
   environment {
@@ -99,10 +100,20 @@ pipeline {
         branch 'deploy/production'
       }
       steps {
+        dir(env.BACKEND_DIR) {
+          sh 'docker compose up -d postgres backend'
+        }
         dir(env.FRONTEND_DIR) {
           sh 'npm run e2e'
         }
         sh 'docker run --rm -i grafana/k6 run - < k6/backend-loadtest.js'
+      }
+      post {
+        always {
+          dir(env.BACKEND_DIR) {
+            sh 'docker compose down -v'
+          }
+        }
       }
     }
   }

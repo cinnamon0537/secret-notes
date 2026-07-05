@@ -44,6 +44,7 @@ Stand: 2026-07-05
 - [x] GitHub Actions für Backend vorhanden
 - [x] GitHub Actions für Frontend vorhanden
 - [x] Jenkinsfile für self-hosted CI vorhanden
+- [x] Jenkins-Setup dokumentiert
 - [x] Lint-Stufe vorhanden
 - [x] Test-Stufe vorhanden
 - [x] Build-Stufe vorhanden
@@ -117,3 +118,5 @@ Stand: 2026-07-05
 - 2026-07-05: Screenshot-Plan erstellt, Jenkins-Screenshot bleibt bis zum echten Jenkins-Run offen.
 - 2026-07-05: Erste AWS- und GitHub-Actions-Screenshots im `screenshots/`-Ordner vorhanden.
 - 2026-07-05: FHTW-Hauptdoku als strukturierter Entwurf angelegt.
+- 2026-07-05: Jenkins-Setup-Doku ergänzt.
+- 2026-07-05: Jenkinsfile um Compose-basierten E2E-/k6-Ablauf ergänzt.

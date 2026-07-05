@@ -10,6 +10,7 @@
 
 - `Jenkinsfile` mirrors the same stages for the self-hosted CI setup.
 - It expects the repo to be checked out on a Jenkins agent with Docker available.
+- Detailed setup notes are in `JENKINS_SETUP.md`.
 
 ## Required Secrets
 
