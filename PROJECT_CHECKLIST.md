@@ -90,6 +90,7 @@ Stand: 2026-07-05
 
 - [x] Root-CI/CD-Doku angelegt
 - [x] Backend-README erweitert
+- [x] FHTW-Hauptdoku als Entwurf angelegt
 - [ ] FHTW-Template-Dokumentation vollständig ausarbeiten
 - [ ] Setup / Usage dokumentieren
 - [ ] Architektur dokumentieren
@@ -115,3 +116,4 @@ Stand: 2026-07-05
 - 2026-07-05: Frontend-CI final repariert durch Hinzufügen von `eslint` als Dev-Dependency.
 - 2026-07-05: Screenshot-Plan erstellt, Jenkins-Screenshot bleibt bis zum echten Jenkins-Run offen.
 - 2026-07-05: Erste AWS- und GitHub-Actions-Screenshots im `screenshots/`-Ordner vorhanden.
+- 2026-07-05: FHTW-Hauptdoku als strukturierter Entwurf angelegt.
