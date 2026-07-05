@@ -113,3 +113,4 @@ Stand: 2026-07-05
 - 2026-07-05: AWS Baseline geprüft: default VPC und default Security Group vorhanden, keine EC2/RDS-Instanzen im Lab.
 - 2026-07-05: Frontend-CI repariert durch ESLint-Konfiguration und Umstellung von Vitest auf `run`-Mode.
 - 2026-07-05: Frontend-CI final repariert durch Hinzufügen von `eslint` als Dev-Dependency.
+- 2026-07-05: Screenshot-Plan erstellt, Jenkins-Screenshot bleibt bis zum echten Jenkins-Run offen.
