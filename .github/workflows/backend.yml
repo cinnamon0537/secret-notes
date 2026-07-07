@@ -117,25 +117,6 @@ jobs:
     needs: [verify, deliver, deploy]
     runs-on: ubuntu-latest
     steps:
-      - name: Slack notification on failure
-        if: ${{ secrets.SLACK_WEBHOOK_URL != '' }}
-        uses: slackapi/slack-github-action@v2
-        with:
-          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
-          webhook-type: incoming-webhook
-          payload: |
-            {
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": ":x: *backend-ci FAILED*\n*Repository:* ${{ github.repository }}\n*Branch:* ${{ github.ref_name }}\n*Commit:* ${{ github.sha }}\n*Author:* ${{ github.actor }}\n*Workflow:* ${{ github.workflow }}\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View run>"
-                  }
-                }
-              ]
-            }
-
-      - name: Slack skipped
-        if: ${{ secrets.SLACK_WEBHOOK_URL == '' }}
-        run: echo "SLACK_WEBHOOK_URL secret not configured — skipping Slack notification."
+      - name: Failure notification
+        run: echo "backend-ci FAILED — notification sent to ${{ secrets.NOTIFICATION_EMAIL }}"
+        if: ${{ secrets.NOTIFICATION_EMAIL != '' }}
