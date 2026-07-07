@@ -153,4 +153,3 @@ jobs:
     steps:
       - name: Failure notification
         run: echo "quality-scans FAILED — notification sent to ${{ secrets.NOTIFICATION_EMAIL }}"
-        if: ${{ secrets.NOTIFICATION_EMAIL != '' }}

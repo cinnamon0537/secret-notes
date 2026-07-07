@@ -143,4 +143,3 @@ jobs:
     steps:
       - name: Failure notification
         run: echo "frontend-ci FAILED — notification sent to ${{ secrets.NOTIFICATION_EMAIL }}"
-        if: ${{ secrets.NOTIFICATION_EMAIL != '' }}
