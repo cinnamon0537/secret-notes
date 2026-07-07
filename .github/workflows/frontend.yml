@@ -6,26 +6,24 @@ on:
       - main
       - deploy/production
     paths:
-      - 'SecretNotes/secret-notes-frontend/**'
+      - 'secret-notes-frontend/**'
       - '.github/workflows/frontend.yml'
       - 'Jenkinsfile'
-      - 'CI_CD.md'
   pull_request:
     branches:
       - main
       - deploy/production
     paths:
-      - 'SecretNotes/secret-notes-frontend/**'
+      - 'secret-notes-frontend/**'
       - '.github/workflows/frontend.yml'
       - 'Jenkinsfile'
-      - 'CI_CD.md'
 
 jobs:
   verify:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: SecretNotes/secret-notes-frontend
+        working-directory: secret-notes-frontend
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -35,7 +33,7 @@ jobs:
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: SecretNotes/secret-notes-frontend/package-lock.json
+          cache-dependency-path: secret-notes-frontend/package-lock.json
 
       - name: Install dependencies
         run: npm ci
@@ -55,7 +53,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: SecretNotes/secret-notes-frontend
+        working-directory: secret-notes-frontend
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -65,7 +63,7 @@ jobs:
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: SecretNotes/secret-notes-frontend/package-lock.json
+          cache-dependency-path: secret-notes-frontend/package-lock.json
 
       - name: Install dependencies
         run: npm ci
@@ -102,7 +100,7 @@ jobs:
         if: ${{ env.DOCKERHUB_USERNAME != '' && env.DOCKERHUB_TOKEN != '' && env.DOCKERHUB_REPOSITORY != '' }}
         uses: docker/build-push-action@v6
         with:
-          context: SecretNotes/secret-notes-frontend
+          context: secret-notes-frontend
           push: true
           tags: |
             ${{ env.DOCKERHUB_REPOSITORY }}:frontend-${{ github.sha }}
@@ -131,8 +129,8 @@ jobs:
             export BACKEND_IMAGE="${DOCKERHUB_REPOSITORY}:backend-latest"
             export FRONTEND_IMAGE="${DOCKERHUB_REPOSITORY}:frontend-latest"
             echo "Deploy frontend image ${FRONTEND_IMAGE} from Docker Hub"
-            docker compose -f /opt/secret-notes/docker-compose.yml pull frontend
-            docker compose -f /opt/secret-notes/docker-compose.yml up -d --no-build frontend
+            docker compose -f /opt/secret-notes/secret-notes-backend/docker-compose.yml pull frontend
+            docker compose -f /opt/secret-notes/secret-notes-backend/docker-compose.yml up -d --no-build frontend
 
       - name: Skip deploy when secrets are missing
         if: ${{ !(env.AWS_DEPLOY_HOST != '' && env.AWS_DEPLOY_USER != '' && env.AWS_DEPLOY_SSH_KEY != '' && env.DOCKERHUB_REPOSITORY != '') }}

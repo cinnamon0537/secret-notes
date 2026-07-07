@@ -7,8 +7,8 @@ pipeline {
   }
 
   environment {
-    FRONTEND_DIR = 'SecretNotes/secret-notes-frontend'
-    BACKEND_DIR = 'SecretNotes/secret-notes-backend'
+    FRONTEND_DIR = 'secret-notes-frontend'
+    BACKEND_DIR = 'secret-notes-backend'
   }
 
   stages {

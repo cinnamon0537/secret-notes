@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-COMPOSE_DIR="$(cd "$(dirname "$0")/../SecretNotes/secret-notes-backend" && pwd)"
+COMPOSE_DIR="$(cd "$(dirname "$0")/../secret-notes-backend" && pwd)"
 NGINX_CONF="$(cd "$(dirname "$0")/.." && pwd)/nginx/nginx.conf"
 NGINX_BLUE="$(cd "$(dirname "$0")/.." && pwd)/nginx/nginx.conf.blue"
 NGINX_GREEN="$(cd "$(dirname "$0")/.." && pwd)/nginx/nginx.conf.green"

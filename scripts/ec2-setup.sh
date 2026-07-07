@@ -45,7 +45,7 @@ docker pull cinnamon0/secret-notes:frontend-latest || echo "Pull failed, will us
 # Start the blue stack as initial active
 echo "Starting BLUE stack..."
 cd /opt/secret-notes
-docker compose -f docker-compose.prod.yml up -d postgres backend-blue frontend-blue nginx
+docker compose -f secret-notes-backend/docker-compose.prod.yml up -d postgres backend-blue frontend-blue nginx
 
 echo ""
 echo "Waiting for services..."
@@ -53,7 +53,7 @@ sleep 10
 
 echo ""
 echo "=== Container Status ==="
-docker compose -f docker-compose.prod.yml ps
+docker compose -f secret-notes-backend/docker-compose.prod.yml ps
 
 echo ""
 echo "=== Health check ==="
@@ -64,4 +64,4 @@ echo ""
 echo "=== Setup complete ==="
 echo "Active stack: BLUE"
 echo "Public URL: http://<EC2_PUBLIC_IP>"
-echo "To switch to green: cd /opt/secret-notes && docker compose -f docker-compose.prod.yml up -d backend-green frontend-green"
+echo "To switch to green: cd /opt/secret-notes && docker compose -f secret-notes-backend/docker-compose.prod.yml up -d backend-green frontend-green"

@@ -11,21 +11,21 @@ echo "=== Deploy Blue/Green ==="
 cd /opt/secret-notes
 
 echo "Starting postgres..."
-docker compose -f docker-compose.prod.yml up -d postgres
+docker compose -f secret-notes-backend/docker-compose.prod.yml up -d postgres
 echo "Waiting for postgres to be healthy..."
 sleep 15
 
 echo "Starting BLUE stack..."
-docker compose -f docker-compose.prod.yml up -d backend-blue frontend-blue
+docker compose -f secret-notes-backend/docker-compose.prod.yml up -d backend-blue frontend-blue
 sleep 15
 
 echo "Starting nginx..."
-docker compose -f docker-compose.prod.yml up -d nginx
+docker compose -f secret-notes-backend/docker-compose.prod.yml up -d nginx
 sleep 5
 
 echo ""
 echo "=== Container Status ==="
-docker compose -f docker-compose.prod.yml ps
+docker compose -f secret-notes-backend/docker-compose.prod.yml ps
 
 echo ""
 echo "=== Backend Health ==="
@@ -34,12 +34,12 @@ curl -sf http://localhost/api/health && echo " OK: nginx proxy" || echo " FAIL: 
 
 echo ""
 echo "=== GREEN stack ready for switch ==="
-docker compose -f docker-compose.prod.yml up -d backend-green frontend-green
+docker compose -f secret-notes-backend/docker-compose.prod.yml up -d backend-green frontend-green
 sleep 10
 
 echo ""
 echo "=== Final Status ==="
-docker compose -f docker-compose.prod.yml ps
+docker compose -f secret-notes-backend/docker-compose.prod.yml ps
 
 echo ""
 echo "Setup complete! Public URL: http://<EC2_PUBLIC_IP>"
