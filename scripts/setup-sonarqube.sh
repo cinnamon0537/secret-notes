@@ -4,6 +4,7 @@ set -euo pipefail
 SQ_URL="${SONARQUBE_URL:-http://localhost:9000}"
 SQ_ADMIN_USER="${SQ_ADMIN_USER:-admin}"
 SQ_ADMIN_PASS="${SQ_ADMIN_PASS:-admin}"
+SQ_NEW_PASSWORD="${SQ_NEW_PASSWORD:-}"
 BACKEND_KEY="secret-notes-backend"
 FRONTEND_KEY="secret-notes-frontend"
 
@@ -14,12 +15,16 @@ until curl -fsS "${SQ_URL}/api/system/status" | grep -q '"status":"UP"'; do
 done
 echo "==> SonarQube is UP"
 
-echo "==> Changing default admin password ..."
-curl -fsS -u "${SQ_ADMIN_USER}:${SQ_ADMIN_PASS}" \
-  -X POST "${SQ_URL}/api/users/change_password" \
-  -d "login=${SQ_ADMIN_USER}&previousPassword=${SQ_ADMIN_PASS}&password=admin123" || echo "    (password may already be changed)"
-
-SQ_AUTH="${SQ_ADMIN_USER}:admin123"
+if [ -z "${SQ_NEW_PASSWORD}" ]; then
+    echo "==> Skipping password change (SQ_NEW_PASSWORD not set)"
+    SQ_AUTH="${SQ_ADMIN_USER}:${SQ_ADMIN_PASS}"
+else
+    echo "==> Changing default admin password ..."
+    curl -fsS -u "${SQ_ADMIN_USER}:${SQ_ADMIN_PASS}" \
+      -X POST "${SQ_URL}/api/users/change_password" \
+      -d "login=${SQ_ADMIN_USER}&previousPassword=${SQ_ADMIN_PASS}&password=${SQ_NEW_PASSWORD}" || echo "    (password may already be changed)"
+    SQ_AUTH="${SQ_ADMIN_USER}:${SQ_NEW_PASSWORD}"
+fi
 
 echo "==> Creating project: ${BACKEND_KEY}"
 curl -fsS -u "${SQ_AUTH}" \
@@ -40,7 +45,7 @@ SQ_TOKEN=$(echo "$TOKEN_RESPONSE" | grep -o '"token":"[^"]*"' | head -1 | cut -d
 echo ""
 echo "============================================"
 echo "  SonarQube ready at: ${SQ_URL}"
-echo "  Login:             ${SQ_ADMIN_USER} / admin123"
+echo "  Login:             ${SQ_ADMIN_USER} / ${SQ_NEW_PASSWORD:-<password>}"
 echo ""
 echo "  Add these to GitHub Secrets:"
 echo "  ----------------------------------------"

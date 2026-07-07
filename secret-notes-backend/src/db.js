@@ -6,9 +6,7 @@ const { Pool } = pg;
 const useSsl = process.env.DATABASE_SSL === 'true';
 
 export const pool = new Pool({
-  connectionString:
-    process.env.DATABASE_URL ||
-    'postgres://postgres:postgres@localhost:5432/encr_notes',
+  connectionString: process.env.DATABASE_URL,
   ssl: useSsl ? { rejectUnauthorized: false } : false,
 });
 

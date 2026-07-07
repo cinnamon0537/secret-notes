@@ -42,4 +42,4 @@ echo "=== Final Status ==="
 docker compose -f docker-compose.prod.yml ps
 
 echo ""
-echo "Setup complete! Public URL: http://35.89.236.72"
+echo "Setup complete! Public URL: http://<EC2_PUBLIC_IP>"

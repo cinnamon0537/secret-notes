@@ -1,12 +1,16 @@
 #!/bin/bash
 set -e
 
-# Update .env with RDS credentials
-cat > /opt/secret-notes/.env << 'ENVEOF'
-DATABASE_URL=postgres://secretnotesadmin:SecretNotes2024!@secret-notes-db.czah9i5vgwj0.us-west-2.rds.amazonaws.com:5432/encr_notes
+# Update .env from environment variables (set these before running)
+if [ -z "${DATABASE_URL}" ]; then
+    echo "ERROR: DATABASE_URL is required. Set it before running this script."
+    exit 1
+fi
+cat > /opt/secret-notes/.env << ENVEOF
+DATABASE_URL=${DATABASE_URL}
 DATABASE_SSL=true
-BACKEND_IMAGE=cinnamon0/secret-notes:backend-latest
-FRONTEND_IMAGE=cinnamon0/secret-notes:frontend-latest
+BACKEND_IMAGE=${BACKEND_IMAGE:-cinnamon0/secret-notes:backend-latest}
+FRONTEND_IMAGE=${FRONTEND_IMAGE:-cinnamon0/secret-notes:frontend-latest}
 ENVEOF
 
 echo "=== .env ==="
@@ -59,5 +63,5 @@ curl -sf http://localhost/api/health && echo "Nginx proxy healthy" || echo "Ngin
 echo ""
 echo "=== Setup complete ==="
 echo "Active stack: BLUE"
-echo "Public URL: http://35.89.236.72"
+echo "Public URL: http://<EC2_PUBLIC_IP>"
 echo "To switch to green: cd /opt/secret-notes && docker compose -f docker-compose.prod.yml up -d backend-green frontend-green"
