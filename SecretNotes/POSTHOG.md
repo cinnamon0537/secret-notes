@@ -13,4 +13,6 @@
 ## Current Status
 
 - PostHog client integration exists in the frontend.
-- Documentation and real PostHog project setup are still pending.
+- The `ui-theme` flag is read on the client to switch between blue and green variants.
+- No redeploy is needed to change the active theme once the flag value changes in PostHog.
+- Real PostHog project setup is still pending.

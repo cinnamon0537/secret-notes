@@ -1,0 +1,177 @@
+name: quality-scans
+
+on:
+  push:
+    branches:
+      - main
+      - deploy/production
+    paths:
+      - 'SecretNotes/secret-notes-backend/**'
+      - 'SecretNotes/secret-notes-frontend/**'
+      - '.github/workflows/quality.yml'
+      - 'QUALITY_SECURITY.md'
+      - 'CI_CD.md'
+  pull_request:
+    branches:
+      - main
+      - deploy/production
+    paths:
+      - 'SecretNotes/secret-notes-backend/**'
+      - 'SecretNotes/secret-notes-frontend/**'
+      - '.github/workflows/quality.yml'
+      - 'QUALITY_SECURITY.md'
+      - 'CI_CD.md'
+
+jobs:
+  backend-quality:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: SecretNotes/secret-notes-backend
+    env:
+      SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      SONAR_BACKEND_PROJECT_KEY: ${{ secrets.SONAR_BACKEND_PROJECT_KEY }}
+      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: SecretNotes/secret-notes-backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm test
+
+      - name: SonarQube scan
+        if: ${{ env.SONAR_HOST_URL != '' && env.SONAR_TOKEN != '' && env.SONAR_BACKEND_PROJECT_KEY != '' }}
+        uses: sonarsource/sonarqube-scan-action@v2
+        env:
+          SONAR_HOST_URL: ${{ env.SONAR_HOST_URL }}
+          SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
+        with:
+          args: >-
+            -Dsonar.projectKey=${{ env.SONAR_BACKEND_PROJECT_KEY }}
+            -Dsonar.projectName=secret-notes-backend
+            -Dsonar.sources=src
+            -Dsonar.tests=tests
+            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
+            -Dsonar.exclusions=**/node_modules/**
+
+      - name: Skip SonarQube when secrets are missing
+        if: ${{ !(env.SONAR_HOST_URL != '' && env.SONAR_TOKEN != '' && env.SONAR_BACKEND_PROJECT_KEY != '') }}
+        run: echo "SonarQube scan skipped because Sonar secrets are not configured"
+
+      - name: Snyk scan
+        if: ${{ env.SNYK_TOKEN != '' }}
+        env:
+          SNYK_TOKEN: ${{ env.SNYK_TOKEN }}
+        run: |
+          npx snyk auth "$SNYK_TOKEN"
+          npx snyk test --severity-threshold=high
+
+      - name: Skip Snyk when secrets are missing
+        if: ${{ env.SNYK_TOKEN == '' }}
+        run: echo "Snyk scan skipped because SNYK_TOKEN is not configured"
+
+  frontend-quality:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: SecretNotes/secret-notes-frontend
+    env:
+      SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      SONAR_FRONTEND_PROJECT_KEY: ${{ secrets.SONAR_FRONTEND_PROJECT_KEY }}
+      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: SecretNotes/secret-notes-frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      - name: SonarQube scan
+        if: ${{ env.SONAR_HOST_URL != '' && env.SONAR_TOKEN != '' && env.SONAR_FRONTEND_PROJECT_KEY != '' }}
+        uses: sonarsource/sonarqube-scan-action@v2
+        env:
+          SONAR_HOST_URL: ${{ env.SONAR_HOST_URL }}
+          SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
+        with:
+          args: >-
+            -Dsonar.projectKey=${{ env.SONAR_FRONTEND_PROJECT_KEY }}
+            -Dsonar.projectName=secret-notes-frontend
+            -Dsonar.sources=src
+            -Dsonar.tests=tests,e2e
+            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
+            -Dsonar.exclusions=**/node_modules/**
+
+      - name: Skip SonarQube when secrets are missing
+        if: ${{ !(env.SONAR_HOST_URL != '' && env.SONAR_TOKEN != '' && env.SONAR_FRONTEND_PROJECT_KEY != '') }}
+        run: echo "SonarQube scan skipped because Sonar secrets are not configured"
+
+      - name: Snyk scan
+        if: ${{ env.SNYK_TOKEN != '' }}
+        env:
+          SNYK_TOKEN: ${{ env.SNYK_TOKEN }}
+        run: |
+          npx snyk auth "$SNYK_TOKEN"
+          npx snyk test --severity-threshold=high
+
+      - name: Skip Snyk when secrets are missing
+        if: ${{ env.SNYK_TOKEN == '' }}
+        run: echo "Snyk scan skipped because SNYK_TOKEN is not configured"
+
+  notify:
+    if: failure() && github.ref == 'refs/heads/deploy/production'
+    needs: [backend-quality, frontend-quality]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Slack notification on failure
+        if: ${{ secrets.SLACK_WEBHOOK_URL != '' }}
+        uses: slackapi/slack-github-action@v2
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": ":x: *quality-scans FAILED*\n*Repository:* ${{ github.repository }}\n*Branch:* ${{ github.ref_name }}\n*Commit:* ${{ github.sha }}\n*Author:* ${{ github.actor }}\n*Workflow:* ${{ github.workflow }}\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View run>"
+                  }
+                }
+              ]
+            }
+
+      - name: Slack skipped
+        if: ${{ secrets.SLACK_WEBHOOK_URL == '' }}
+        run: echo "SLACK_WEBHOOK_URL secret not configured — skipping Slack notification."

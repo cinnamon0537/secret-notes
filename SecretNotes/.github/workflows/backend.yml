@@ -92,19 +92,52 @@ jobs:
       AWS_DEPLOY_HOST: ${{ secrets.AWS_DEPLOY_HOST }}
       AWS_DEPLOY_USER: ${{ secrets.AWS_DEPLOY_USER }}
       AWS_DEPLOY_SSH_KEY: ${{ secrets.AWS_DEPLOY_SSH_KEY }}
+      DOCKERHUB_REPOSITORY: ${{ secrets.DOCKERHUB_REPOSITORY }}
     steps:
       - name: Deploy to AWS EC2
-        if: ${{ env.AWS_DEPLOY_HOST != '' && env.AWS_DEPLOY_USER != '' && env.AWS_DEPLOY_SSH_KEY != '' }}
+        if: ${{ env.AWS_DEPLOY_HOST != '' && env.AWS_DEPLOY_USER != '' && env.AWS_DEPLOY_SSH_KEY != '' && env.DOCKERHUB_REPOSITORY != '' }}
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ env.AWS_DEPLOY_HOST }}
           username: ${{ env.AWS_DEPLOY_USER }}
           key: ${{ env.AWS_DEPLOY_SSH_KEY }}
+          envs: DOCKERHUB_REPOSITORY
           script: |
             set -e
-            echo "Deploy backend image ${DOCKERHUB_REPOSITORY:-unknown} from Docker Hub"
-            docker compose -f /opt/secret-notes/docker-compose.yml up -d backend
+            export BACKEND_IMAGE="${DOCKERHUB_REPOSITORY}:backend-latest"
+            export FRONTEND_IMAGE="${DOCKERHUB_REPOSITORY}:frontend-latest"
+            echo "Deploy backend image ${BACKEND_IMAGE} from Docker Hub"
+            docker compose -f /opt/secret-notes/docker-compose.yml pull backend
+            docker compose -f /opt/secret-notes/docker-compose.yml up -d --no-build backend
 
       - name: Skip deploy when secrets are missing
-        if: ${{ !(env.AWS_DEPLOY_HOST != '' && env.AWS_DEPLOY_USER != '' && env.AWS_DEPLOY_SSH_KEY != '') }}
-        run: echo "Deploy skipped because AWS secrets are not configured"
+        if: ${{ !(env.AWS_DEPLOY_HOST != '' && env.AWS_DEPLOY_USER != '' && env.AWS_DEPLOY_SSH_KEY != '' && env.DOCKERHUB_REPOSITORY != '') }}
+        run: echo "Deploy skipped because AWS or Docker Hub secrets are not configured"
+
+  notify:
+    if: failure() && github.ref == 'refs/heads/deploy/production'
+    needs: [verify, deliver, deploy]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Slack notification on failure
+        if: ${{ secrets.SLACK_WEBHOOK_URL != '' }}
+        uses: slackapi/slack-github-action@v2
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": ":x: *backend-ci FAILED*\n*Repository:* ${{ github.repository }}\n*Branch:* ${{ github.ref_name }}\n*Commit:* ${{ github.sha }}\n*Author:* ${{ github.actor }}\n*Workflow:* ${{ github.workflow }}\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View run>"
+                  }
+                }
+              ]
+            }
+
+      - name: Slack skipped
+        if: ${{ secrets.SLACK_WEBHOOK_URL == '' }}
+        run: echo "SLACK_WEBHOOK_URL secret not configured — skipping Slack notification."

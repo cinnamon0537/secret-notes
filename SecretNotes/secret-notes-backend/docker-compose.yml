@@ -1,4 +1,16 @@
 services:
+  sonarqube:
+    image: sonarqube:lts-community
+    container_name: secret-notes-sonarqube
+    environment:
+      SONAR_ES_BOOTSTRAP_CHECKS_DISABLE: "true"
+    ports:
+      - "9000:9000"
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_logs:/opt/sonarqube/logs
+
   postgres:
     image: postgres:16
     container_name: secret-notes-postgres
@@ -12,18 +24,21 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
   backend:
+    image: ${BACKEND_IMAGE:-secret-notes-backend-backend}
     build: .
     container_name: secret-notes-backend
     depends_on:
       - postgres
     environment:
       PORT: 3000
-      DATABASE_URL: postgres://postgres:postgres@postgres:5432/encr_notes
+      DATABASE_URL: ${DATABASE_URL:-postgres://postgres:postgres@postgres:5432/encr_notes}
+      DATABASE_SSL: ${DATABASE_SSL:-false}
     ports:
       - "3000:3000"
     command: sh -c "npm run db:migrate && npm start"
 
   frontend:
+    image: ${FRONTEND_IMAGE:-secret-notes-backend-frontend}
     build: ../secret-notes-frontend
     container_name: secret-notes-frontend
     depends_on:
@@ -35,3 +50,6 @@ services:
 
 volumes:
   postgres_data:
+  sonarqube_data:
+  sonarqube_extensions:
+  sonarqube_logs:

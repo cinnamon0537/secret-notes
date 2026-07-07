@@ -57,3 +57,8 @@ Run the Secret Notes pipelines on a self-hosted Jenkins instance.
 - Pipeline overview with green status
 - Stage view showing all stages green
 - Console output with `SUCCESS`
+
+## Existing Jobs
+
+- **SecretNotes-Demo-FS**: Demo freestyle job, verified green.
+- **SecretNotes-CI**: Real CI freestyle job that runs backend lint/test and frontend lint/test/build. Build #1: SUCCESS.

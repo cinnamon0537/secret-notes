@@ -3,10 +3,13 @@ import 'dotenv/config';
 
 const { Pool } = pg;
 
+const useSsl = process.env.DATABASE_SSL === 'true';
+
 export const pool = new Pool({
   connectionString:
     process.env.DATABASE_URL ||
     'postgres://postgres:postgres@localhost:5432/encr_notes',
+  ssl: useSsl ? { rejectUnauthorized: false } : false,
 });
 
 export async function query(text, params) {
