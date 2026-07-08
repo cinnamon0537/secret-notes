@@ -12,6 +12,7 @@ function App() {
 
   useEffect(() => {
     const flag = getFeatureFlag('ui-theme')
+    console.log('Feature flag ui-theme:', flag)
     setTheme(flag)
     identifyUser(`anon_${Math.random().toString(36).slice(2)}`)
   }, [])

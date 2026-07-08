@@ -8,6 +8,8 @@ if (POSTHOG_KEY) {
     api_host: POSTHOG_HOST,
     person_profiles: 'identified_only',
   })
+  window.posthog = posthog
+  console.log('PostHog initialized with key:', POSTHOG_KEY.substring(0, 8) + '...')
 }
 
 export function getFeatureFlag(key) {
