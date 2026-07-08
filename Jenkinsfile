@@ -6,7 +6,7 @@ pipeline {
     disableConcurrentBuilds()
   }
 
-  // Re-trigger after EC2 restart
+  // Re-deploy with updated AWS host IP
 
   environment {
     FRONTEND_DIR = 'secret-notes-frontend'
