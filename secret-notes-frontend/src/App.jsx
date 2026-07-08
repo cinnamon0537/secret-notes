@@ -11,14 +11,17 @@ function App() {
   const location = useLocation()
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const urlTheme = params.get('theme')
+
     const applyFlag = () => {
-      const flag = getFeatureFlag('ui-theme')
-      console.log('Feature flag ui-theme:', flag)
+      const flag = urlTheme || getFeatureFlag('ui-theme')
+      console.log('Feature flag ui-theme:', flag, urlTheme ? '(URL override)' : '')
       setTheme(flag)
     }
     applyFlag()
     identifyUser(`anon_${Math.random().toString(36).slice(2)}`)
-    const timer = setTimeout(applyFlag, 1000)
+    const timer = setTimeout(applyFlag, 1500)
     return () => clearTimeout(timer)
   }, [])
 
