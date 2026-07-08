@@ -126,8 +126,8 @@ jobs:
           envs: DOCKERHUB_REPOSITORY
           script: |
             set -e
-            export BACKEND_IMAGE="${DOCKERHUB_REPOSITORY}:backend-latest"
-            export FRONTEND_IMAGE="${DOCKERHUB_REPOSITORY}:frontend-latest"
+            FRONTEND_IMAGE="${DOCKERHUB_REPOSITORY:-cinnamon0/secret-notes}:frontend-latest"
+            export FRONTEND_IMAGE
             echo "Deploy frontend image ${FRONTEND_IMAGE} from Docker Hub"
             docker compose -f /opt/secret-notes/docker-compose.prod.yml pull frontend-blue
             docker compose -f /opt/secret-notes/docker-compose.prod.yml up -d --no-build frontend-blue
