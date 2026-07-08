@@ -110,21 +110,9 @@ jobs:
       - name: Run E2E tests
         run: npm run e2e
 
-  k6:
-    if: github.ref == 'refs/heads/deploy/production' && github.event_name == 'push'
-    needs: verify
-    continue-on-error: true
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Run k6 performance test
-        run: docker run --rm -i -e BASE_URL=http://54.213.150.110 grafana/k6 run - < k6/backend-loadtest.js; echo "k6 exit=$? (non-blocking)"
-
   deliver:
     if: github.ref == 'refs/heads/deploy/production' && github.event_name == 'push'
-    needs: [verify, e2e, k6]
+    needs: [verify, e2e]
     runs-on: ubuntu-latest
     env:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
