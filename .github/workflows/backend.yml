@@ -105,8 +105,8 @@ jobs:
             export BACKEND_IMAGE="${DOCKERHUB_REPOSITORY}:backend-latest"
             export FRONTEND_IMAGE="${DOCKERHUB_REPOSITORY}:frontend-latest"
             echo "Deploy backend image ${BACKEND_IMAGE} from Docker Hub"
-            docker compose -f /opt/secret-notes/secret-notes-backend/docker-compose.yml pull backend
-            docker compose -f /opt/secret-notes/secret-notes-backend/docker-compose.yml up -d --no-build backend
+            docker compose -f /opt/secret-notes/docker-compose.prod.yml pull backend-blue
+            docker compose -f /opt/secret-notes/docker-compose.prod.yml up -d --no-build backend-blue
 
       - name: Skip deploy when secrets are missing
         if: ${{ !(env.AWS_DEPLOY_HOST != '' && env.AWS_DEPLOY_USER != '' && env.AWS_DEPLOY_SSH_KEY != '' && env.DOCKERHUB_REPOSITORY != '') }}
