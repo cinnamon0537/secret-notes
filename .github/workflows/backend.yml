@@ -24,6 +24,11 @@ jobs:
     defaults:
       run:
         working-directory: secret-notes-backend
+    env:
+      SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      SONAR_BACKEND_PROJECT_KEY: ${{ secrets.SONAR_BACKEND_PROJECT_KEY }}
+      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -41,8 +46,39 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Snyk security scan
+        if: ${{ env.SNYK_TOKEN != '' }}
+        env:
+          SNYK_TOKEN: ${{ env.SNYK_TOKEN }}
+        run: |
+          npx snyk auth "$SNYK_TOKEN"
+          npx snyk test --severity-threshold=high
+
+      - name: Skip Snyk (token missing)
+        if: ${{ env.SNYK_TOKEN == '' }}
+        run: echo "Snyk skipped — SNYK_TOKEN not configured"
+
       - name: Test
         run: npm test
+
+      - name: SonarQube scan
+        if: ${{ env.SONAR_HOST_URL != '' && env.SONAR_TOKEN != '' && env.SONAR_BACKEND_PROJECT_KEY != '' }}
+        uses: sonarsource/sonarqube-scan-action@v2
+        env:
+          SONAR_HOST_URL: ${{ env.SONAR_HOST_URL }}
+          SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
+        with:
+          args: >-
+            -Dsonar.projectKey=${{ env.SONAR_BACKEND_PROJECT_KEY }}
+            -Dsonar.projectName=secret-notes-backend
+            -Dsonar.sources=src
+            -Dsonar.tests=tests
+            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
+            -Dsonar.exclusions=**/node_modules/**
+
+      - name: Skip SonarQube (secrets missing)
+        if: ${{ !(env.SONAR_HOST_URL != '' && env.SONAR_TOKEN != '' && env.SONAR_BACKEND_PROJECT_KEY != '') }}
+        run: echo "SonarQube skipped — secrets not configured"
 
       - name: Build Docker image
         run: docker build -t secret-notes-backend:${{ github.sha }} .
@@ -105,8 +141,9 @@ jobs:
             BACKEND_IMAGE="${DOCKERHUB_REPOSITORY:-cinnamon0/secret-notes}:backend-latest"
             export BACKEND_IMAGE
             echo "Deploy backend image ${BACKEND_IMAGE} from Docker Hub"
-            docker compose -f /opt/secret-notes/docker-compose.prod.yml pull backend-blue
-            docker compose -f /opt/secret-notes/docker-compose.prod.yml up -d --no-build backend-blue
+            cd /opt/secret-notes
+            docker compose -f docker-compose.prod.yml pull backend-blue backend-green
+            docker compose -f docker-compose.prod.yml up -d --no-build backend-blue backend-green
 
       - name: Skip deploy when secrets are missing
         if: ${{ !(env.AWS_DEPLOY_HOST != '' && env.AWS_DEPLOY_USER != '' && env.AWS_DEPLOY_SSH_KEY != '' && env.DOCKERHUB_REPOSITORY != '') }}
@@ -118,4 +155,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Failure notification
-        run: echo "backend-ci FAILED — notification sent to ${{ secrets.NOTIFICATION_EMAIL }}"
+        run: echo "backend-ci FAILED ΓÇö notification sent to ${{ secrets.NOTIFICATION_EMAIL }}"

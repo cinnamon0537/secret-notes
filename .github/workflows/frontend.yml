@@ -24,6 +24,11 @@ jobs:
     defaults:
       run:
         working-directory: secret-notes-frontend
+    env:
+      SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      SONAR_FRONTEND_PROJECT_KEY: ${{ secrets.SONAR_FRONTEND_PROJECT_KEY }}
+      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -41,8 +46,39 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Snyk security scan
+        if: ${{ env.SNYK_TOKEN != '' }}
+        env:
+          SNYK_TOKEN: ${{ env.SNYK_TOKEN }}
+        run: |
+          npx snyk auth "$SNYK_TOKEN"
+          npx snyk test --severity-threshold=high
+
+      - name: Skip Snyk (token missing)
+        if: ${{ env.SNYK_TOKEN == '' }}
+        run: echo "Snyk skipped — SNYK_TOKEN not configured"
+
       - name: Unit tests
         run: npm test
+
+      - name: SonarQube scan
+        if: ${{ env.SONAR_HOST_URL != '' && env.SONAR_TOKEN != '' && env.SONAR_FRONTEND_PROJECT_KEY != '' }}
+        uses: sonarsource/sonarqube-scan-action@v2
+        env:
+          SONAR_HOST_URL: ${{ env.SONAR_HOST_URL }}
+          SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
+        with:
+          args: >-
+            -Dsonar.projectKey=${{ env.SONAR_FRONTEND_PROJECT_KEY }}
+            -Dsonar.projectName=secret-notes-frontend
+            -Dsonar.sources=src
+            -Dsonar.tests=tests,e2e
+            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
+            -Dsonar.exclusions=**/node_modules/**
+
+      - name: Skip SonarQube (secrets missing)
+        if: ${{ !(env.SONAR_HOST_URL != '' && env.SONAR_TOKEN != '' && env.SONAR_FRONTEND_PROJECT_KEY != '') }}
+        run: echo "SonarQube skipped — secrets not configured"
 
       - name: Build
         run: npm run build
@@ -74,9 +110,23 @@ jobs:
       - name: Run E2E tests
         run: npm run e2e
 
-  deliver:
+  k6:
     if: github.ref == 'refs/heads/deploy/production' && github.event_name == 'push'
     needs: verify
+    continue-on-error: true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run k6 performance test
+        uses: grafana/k6-action@v0.3
+        with:
+          filename: k6/backend-loadtest.js
+
+  deliver:
+    if: github.ref == 'refs/heads/deploy/production' && github.event_name == 'push'
+    needs: [verify, e2e, k6]
     runs-on: ubuntu-latest
     env:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -129,8 +179,11 @@ jobs:
             FRONTEND_IMAGE="${DOCKERHUB_REPOSITORY:-cinnamon0/secret-notes}:frontend-latest"
             export FRONTEND_IMAGE
             echo "Deploy frontend image ${FRONTEND_IMAGE} from Docker Hub"
-            docker compose -f /opt/secret-notes/docker-compose.prod.yml pull frontend-blue
-            docker compose -f /opt/secret-notes/docker-compose.prod.yml up -d --no-build frontend-blue
+            cd /opt/secret-notes
+            docker compose -f docker-compose.prod.yml pull frontend-blue frontend-green
+            docker compose -f docker-compose.prod.yml up -d --no-build frontend-blue frontend-green
+            echo "Running blue/green health check and switch..."
+            bash blue-green-switch.sh
 
       - name: Skip deploy when secrets are missing
         if: ${{ !(env.AWS_DEPLOY_HOST != '' && env.AWS_DEPLOY_USER != '' && env.AWS_DEPLOY_SSH_KEY != '' && env.DOCKERHUB_REPOSITORY != '') }}
@@ -138,8 +191,8 @@ jobs:
 
   notify:
     if: failure() && github.ref == 'refs/heads/deploy/production'
-    needs: [verify, e2e, deliver, deploy]
+    needs: [verify, e2e, k6, deliver, deploy]
     runs-on: ubuntu-latest
     steps:
       - name: Failure notification
-        run: echo "frontend-ci FAILED — notification sent to ${{ secrets.NOTIFICATION_EMAIL }}"
+        run: echo "frontend-ci FAILED ΓÇö notification sent to ${{ secrets.NOTIFICATION_EMAIL }}"
