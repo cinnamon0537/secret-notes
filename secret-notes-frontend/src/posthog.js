@@ -17,6 +17,11 @@ export function getFeatureFlag(key) {
   return posthog.getFeatureFlag(key) || 'control'
 }
 
+export function onFeatureFlags(callback) {
+  if (!POSTHOG_KEY) return
+  posthog.onFeatureFlags(callback)
+}
+
 export function identifyUser(userId) {
   if (POSTHOG_KEY) {
     posthog.identify(userId)
