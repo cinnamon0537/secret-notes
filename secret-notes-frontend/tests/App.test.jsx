@@ -8,6 +8,8 @@ vi.mock('../src/posthog', () => ({
   getFeatureFlag: mockGetFeatureFlag,
   identifyUser: vi.fn(),
   captureEvent: vi.fn(),
+  reloadFlags: vi.fn((cb) => cb()),
+  onFeatureFlags: vi.fn(),
   default: {},
 }))
 
