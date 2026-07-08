@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import Home from './pages/Home'
 import CreateNote from './pages/CreateNote'
 import ReadNote from './pages/ReadNote'
-import { getFeatureFlag, identifyUser, onFeatureFlags } from './posthog'
+import { getFeatureFlag, identifyUser, reloadFlags } from './posthog'
 import './App.css'
 
 function App() {
@@ -11,17 +11,16 @@ function App() {
   const location = useLocation()
 
   useEffect(() => {
-    const flag = getFeatureFlag('ui-theme')
-    console.log('Feature flag ui-theme (initial):', flag)
-    setTheme(flag)
-
-    onFeatureFlags(() => {
-      const updated = getFeatureFlag('ui-theme')
-      console.log('Feature flag ui-theme (updated):', updated)
-      setTheme(updated)
-    })
-
     identifyUser(`anon_${Math.random().toString(36).slice(2)}`)
+
+    const applyFlag = () => {
+      const flag = getFeatureFlag('ui-theme')
+      console.log('Feature flag ui-theme:', flag)
+      setTheme(flag)
+    }
+
+    applyFlag()
+    reloadFlags(applyFlag)
   }, [])
 
   const isGreenTheme = theme === 'test'

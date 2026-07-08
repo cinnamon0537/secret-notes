@@ -14,12 +14,18 @@ if (POSTHOG_KEY) {
 
 export function getFeatureFlag(key) {
   if (!POSTHOG_KEY) return 'control'
-  return posthog.getFeatureFlag(key) || 'control'
+  const flag = posthog.getFeatureFlag(key)
+  console.log('getFeatureFlag', key, flag)
+  return flag || 'control'
 }
 
-export function onFeatureFlags(callback) {
+export function reloadFlags(callback) {
   if (!POSTHOG_KEY) return
-  posthog.onFeatureFlags(callback)
+  posthog.onFeatureFlags(() => {
+    console.log('onFeatureFlags fired')
+    callback()
+  })
+  posthog.reloadFeatureFlags()
 }
 
 export function identifyUser(userId) {
