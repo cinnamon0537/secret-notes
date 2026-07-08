@@ -6,6 +6,8 @@ pipeline {
     disableConcurrentBuilds()
   }
 
+  // Re-trigger after EC2 restart
+
   environment {
     FRONTEND_DIR = 'secret-notes-frontend'
     BACKEND_DIR = 'secret-notes-backend'
