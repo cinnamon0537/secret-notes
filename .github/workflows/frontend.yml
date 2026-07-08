@@ -168,8 +168,6 @@ jobs:
             cd /opt/secret-notes
             docker compose -f docker-compose.prod.yml pull frontend-blue frontend-green
             docker compose -f docker-compose.prod.yml up -d --no-build frontend-blue frontend-green
-            echo "Running blue/green health check and switch..."
-            bash blue-green-switch.sh
 
       - name: Skip deploy when secrets are missing
         if: ${{ !(env.AWS_DEPLOY_HOST != '' && env.AWS_DEPLOY_USER != '' && env.AWS_DEPLOY_SSH_KEY != '' && env.DOCKERHUB_REPOSITORY != '') }}
